@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="/socket.io/socket.io.js">
+
+    </script>
+    <title>Document</title>
+    <style>
+        * {
+            font-family: 'Helvetica Neue', Helvetica, sans-serif;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        a {
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .container {
+            width: 400px;
+            display: block;
+            margin: 0 auto;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .header {
+            padding: 20px 20px 18px 20px;
+            background: #5FB471;
+            color: #fff;
+        }
+
+        .header h2 {
+            font-size: 16px;
+            line-height: 15px;
+            display: inline-block;
+        }
+
+        .header a {
+            display: inline-block;
+            float: right;
+            background: #3d8b4e;
+            font-size: 25px;
+            line-height: 20px;
+            padding: 3px 6px;
+            margin-top: -5px;
+            border-radius: 2px;
+        }
+
+        .chat-box,
+        .enter-message {
+            background: #ECECEC;
+            padding: 0 20px;
+            color: #a1a1a1;
+        }
+
+        .chat-box .message-box {
+            padding: 18px 0 10px;
+            clear: both;
+        }
+
+        .message-box .picture {
+            float: left;
+            width: 50px;
+            display: block;
+            padding-right: 10px;
+        }
+
+        .picture img {
+            width: 43px;
+            height: 48px;
+            border-radius: 5px;
+        }
+
+        .picture span {
+            font-weight: bold;
+            font-size: 12px;
+            clear: both;
+            display: block;
+            text-align: center;
+            margin-top: 3px;
+        }
+
+        .message {
+            background: #fff;
+            display: inline-block;
+            padding: 13px;
+            width: 274px;
+            border-radius: 2px;
+            box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+            position: relative;
+        }
+
+        .message:before {
+            content: "";
+            position: absolute;
+            display: block;
+            left: 0;
+            border-right: 6px solid #fff;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            top: 10px;
+            margin-left: -6px;
+        }
+
+        .message span {
+            color: #555;
+            font-weight: bold;
+        }
+
+        .message p {
+            padding-top: 5px;
+        }
+
+        .message-box.right-img .picture {
+            float: right;
+            padding: 0;
+            padding-left: 10px;
+        }
+
+        .message-box.right-img .picture img {
+            float: right;
+        }
+
+        .message-box.right-img .message:before {
+            left: 100%;
+            margin-right: 6px;
+            margin-left: 0;
+            border-right: 6px solid transparent;
+            border-left: 6px solid #fff;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+        }
+
+        .enter-message {
+            padding: 13px 0px;
+        }
+
+        .enter-message input {
+            border: none;
+            padding: 10px 12px;
+            background: #d3d3d3;
+            width: 260px;
+            border-radius: 2px;
+        }
+
+        .enter-message a.send {
+            padding: 10px 15px;
+            background: #6294c2;
+            border-radius: 2px;
+            float: right;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+</head>
+
+<body>
+
+    
+    <a href="http://dribbble.com/shots/966016-Messages?list=users" style="color:#09c; padding:20px; display:block; clear:both; text-align:center;">Demo de un chat privado</a>
+
+    <div class="container">
+        <div class="header">
+            <h2>Messages</h2>
+            <a href="#" title="Add Friend to this chat">+</a>
+        </div>
+        <div class="chat-box">
+            <div class="container-chat">
+                
+
+            </div>
+
+            <div class="enter-message">
+                <input id="mensaje" type="text" placeholder="Enter your message.." />
+                <a href="#" class="send">Send</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<script>
+    var conversation_id = 123456789;
+    var box1 = $('.container-chat');
+    var socket = io.connect('http://localhost:3000/', { 'forceNew': true });
+    socket.emit('subscribe', conversation_id);
+
+    $('.send').click(function () {
+
+        
+        var mensaje = $("#mensaje").val();
+        var userinfo =  {
+            room: conversation_id,
+            nameUser: "Oscar Martinez",
+            profilePicture: "https://scontent-lax3-1.xx.fbcdn.net/v/t1.0-9/19511305_1688404567866428_3195463923352528284_n.jpg?oh=07a7fdef0106bdfbdeb2510c063964d1&oe=5A11F992",
+            message: mensaje
+        }
+         box1.append(`<div class="message-box left-img">
+                <div class="picture">
+                    <img src="${userinfo.profilePicture}" title="user name" />
+                    <span class="time">10 mins</span>
+                </div>
+                <div class="message">
+                    <span>${userinfo.nameUser}</span>
+                    <p>${userinfo.message}</p>
+                </div>
+            </div>`);
+        
+        
+        socket.emit('send menssage', {
+            room: conversation_id,
+            nameUser: "Oscar Martinez",
+            profilePicture: "https://scontent-lax3-1.xx.fbcdn.net/v/t1.0-9/19511305_1688404567866428_3195463923352528284_n.jpg?oh=07a7fdef0106bdfbdeb2510c063964d1&oe=5A11F992",
+            message: mensaje
+        });
+        
+    })
+
+    socket.on('conversation private post', (data) => {
+            console.log(data.data);
+           
+            var info = ` <div class="message-box right-img">
+                    <div class="picture">
+                        <img src="${data.data.profilePicture}" title="user name"
+                        />
+                        <span class="time">2 mins</span>
+                    </div>
+                    <div class="message">
+                        <span>${data.data.nameUser}</span>
+                        <p>${data.data.message}</p>
+                    </div>
+                </div>`;
+            box1.append(info);
+        });
+</script>
+
+</html>
